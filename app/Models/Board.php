@@ -229,4 +229,9 @@ class Board extends Model
     {
         return $this->hasMany(Stage::class)->orderBy('position');
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
 }

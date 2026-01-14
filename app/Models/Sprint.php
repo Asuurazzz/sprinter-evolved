@@ -150,4 +150,9 @@ class Sprint extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
 }

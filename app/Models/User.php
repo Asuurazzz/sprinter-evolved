@@ -237,4 +237,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(BoardMember::class);
     }
+
+    public function createdTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'creator_id');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'author_id');
+    }
+
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
+    public function taskAssignments(): HasMany
+    {
+        return $this->hasMany(TaskAssignee::class);
+    }
 }

@@ -53,4 +53,9 @@ class Label extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function taskLabels(): HasMany
+    {
+        return $this->hasMany(TaskLabel::class);
+    }
 }

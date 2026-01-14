@@ -8,35 +8,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Stage extends Model
+class ChecklistItem extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'board_id',
-        'name',
-        'color',
+        'checklist_group_id',
+        'text',
+        'is_completed',
+        'completed_by',
+        'completed_at',
         'position',
-        'conclusion',
     ];
 
     protected function casts(): array
     {
         return [
+            'is_completed' => 'boolean',
+            'completed_at' => 'datetime',
             'position' => 'integer',
-            'conclusion' => 'boolean',
             'deleted_at' => 'datetime',
         ];
     }
 
     // ========================================
-    // Domain Methods - Profile Updates
+    // Domain Methods
     // ========================================
 
-    public function updateProfile(string $name, string $color): void
+    public function updateText(string $text): void
     {
-        $this->name = $name;
-        $this->color = $color;
+        $this->text = $text;
         $this->save();
     }
 
@@ -48,22 +49,22 @@ class Stage extends Model
         }
     }
 
-    // ========================================
-    // Domain Methods - Conclusion Management
-    // ========================================
-
-    public function markAsConclusion(): void
+    public function complete(string $userId): void
     {
-        if (! $this->conclusion) {
-            $this->conclusion = true;
+        if (! $this->is_completed) {
+            $this->is_completed = true;
+            $this->completed_by = $userId;
+            $this->completed_at = now();
             $this->save();
         }
     }
 
-    public function unmarkAsConclusion(): void
+    public function uncomplete(): void
     {
-        if ($this->conclusion) {
-            $this->conclusion = false;
+        if ($this->is_completed) {
+            $this->is_completed = false;
+            $this->completed_by = null;
+            $this->completed_at = null;
             $this->save();
         }
     }
@@ -72,27 +73,22 @@ class Stage extends Model
     // Query Helpers
     // ========================================
 
-    public function isConclusion(): bool
+    public function isCompleted(): bool
     {
-        return $this->conclusion;
-    }
-
-    public function isActive(): bool
-    {
-        return ! $this->trashed();
+        return $this->is_completed;
     }
 
     // ========================================
     // Relationships
     // ========================================
 
-    public function board(): BelongsTo
+    public function checklistGroup(): BelongsTo
     {
-        return $this->belongsTo(Board::class);
+        return $this->belongsTo(ChecklistGroup::class);
     }
 
-    public function tasks(): HasMany
+    public function completedByUser(): BelongsTo
     {
-        return $this->hasMany(Task::class)->orderBy('position');
+        return $this->belongsTo(User::class, 'completed_by');
     }
 }

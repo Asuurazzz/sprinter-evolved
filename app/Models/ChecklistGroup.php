@@ -6,37 +6,34 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Stage extends Model
+class ChecklistGroup extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'board_id',
+        'task_id',
         'name',
-        'color',
         'position',
-        'conclusion',
     ];
 
     protected function casts(): array
     {
         return [
             'position' => 'integer',
-            'conclusion' => 'boolean',
             'deleted_at' => 'datetime',
         ];
     }
 
     // ========================================
-    // Domain Methods - Profile Updates
+    // Domain Methods
     // ========================================
 
-    public function updateProfile(string $name, string $color): void
+    public function updateName(string $name): void
     {
         $this->name = $name;
-        $this->color = $color;
         $this->save();
     }
 
@@ -49,50 +46,39 @@ class Stage extends Model
     }
 
     // ========================================
-    // Domain Methods - Conclusion Management
-    // ========================================
-
-    public function markAsConclusion(): void
-    {
-        if (! $this->conclusion) {
-            $this->conclusion = true;
-            $this->save();
-        }
-    }
-
-    public function unmarkAsConclusion(): void
-    {
-        if ($this->conclusion) {
-            $this->conclusion = false;
-            $this->save();
-        }
-    }
-
-    // ========================================
     // Query Helpers
     // ========================================
 
-    public function isConclusion(): bool
+    public function completionPercentage(): float
     {
-        return $this->conclusion;
+        $total = $this->items()->count();
+
+        if ($total === 0) {
+            return 0;
+        }
+
+        $completed = $this->items()->where('is_completed', true)->count();
+
+        return round(($completed / $total) * 100, 2);
     }
 
-    public function isActive(): bool
+    public function isFullyCompleted(): bool
     {
-        return ! $this->trashed();
+        return $this->items()->count() > 0 &&
+               $this->items()->where('is_completed', false)->count() === 0;
     }
 
     // ========================================
     // Relationships
     // ========================================
 
-    public function board(): BelongsTo
+    public function task(): BelongsTo
     {
-        return $this->belongsTo(Board::class);
+        return $this->belongsTo(Task::class);
     }
 
-    public function tasks(): HasMany
+    public function items(): HasMany
     {
-        return $this->hasMany(Task::class)->orderBy('position');
+        return $this->hasMany(ChecklistItem::class)->orderBy('position');
     }
 }
