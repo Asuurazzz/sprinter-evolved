@@ -232,4 +232,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Team::class, 'owner_id');
     }
+
+    public function boardMemberships(): HasMany
+    {
+        return $this->hasMany(BoardMember::class);
+    }
 }

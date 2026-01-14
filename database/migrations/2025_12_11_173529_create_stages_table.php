@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('color')->nullable();
             $table->integer('position')->default(0);
+            $table->boolean('conclusion')->default(false);
             $table->timestamps();
             $table->softDeletes();
 

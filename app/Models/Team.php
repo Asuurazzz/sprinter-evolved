@@ -235,4 +235,24 @@ class Team extends Model
     {
         return $this->hasMany(TeamJoinRequest::class);
     }
+
+    public function boards(): HasMany
+    {
+        return $this->hasMany(Board::class);
+    }
+
+    public function labels(): HasMany
+    {
+        return $this->hasMany(Label::class);
+    }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function sprints(): HasMany
+    {
+        return $this->hasMany(Sprint::class);
+    }
 }
