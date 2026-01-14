@@ -255,4 +255,14 @@ class Team extends Model
     {
         return $this->hasMany(Sprint::class);
     }
+
+    public function knowledgeCategories(): HasMany
+    {
+        return $this->hasMany(KnowledgeCategory::class);
+    }
+
+    public function knowledgeContents(): HasMany
+    {
+        return $this->hasMany(KnowledgeContent::class);
+    }
 }

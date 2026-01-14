@@ -257,4 +257,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(TaskAssignee::class);
     }
+
+    public function knowledgeContents(): HasMany
+    {
+        return $this->hasMany(KnowledgeContent::class, 'author_id');
+    }
+
+    public function knowledgeComments(): HasMany
+    {
+        return $this->hasMany(KnowledgeComment::class, 'author_id');
+    }
 }
